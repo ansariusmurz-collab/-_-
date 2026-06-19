@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="google" content="notranslate">
+    <title>Hadith Trainer Pro</title>
+    <style>
+        :root {
+            --bg-color: #e8fff7;
+            --panel-bg: rgba(245, 255, 255, 0.96);
+            --accent: #17a2a2;
+            --accent2: #35c2ff;
+            --text-color: #0b4f3f;
+            --text-secondary: #0f6d9d;
+            --white: #ffffff;
+            --panel-width: 380px; /* Телефонный режим по умолчанию */
+        }
+
+        body.desktop-mode {
+            --panel-width: 90%;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f4fff8 0%, #d9f6ff 45%, #f3feff 100%);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .app-container { width: 100%; height: 100%; background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(222, 255, 251, 0.95)); border-radius: 0; box-shadow: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; border: none; overflow: hidden; }
+
+        .app-container::before,
+        .app-container::after {
+            content: '';
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .app-container::before {
+            width: 220px;
+            height: 220px;
+            top: -60px;
+            right: -60px;
+            background: rgba(53, 194, 255, 0.2);
+            border-radius: 28px;
+            transform: rotate(25deg);
+        }
+
+        .app-container::after {
+            width: 180px;
+            height: 180px;
+            bottom: -50px;
+            left: -50px;
+            background: rgba(23, 162, 162, 0.18);
+            border-radius: 24px;
+            transform: rotate(-18deg);
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            padding: 30px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .screen.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h2 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-size: clamp(1.9rem, 2.8vw, 2.6rem);
+            letter-spacing: 0.02em;
+        }
+
+        textarea {
+            width: 92%;
+            height: 42%;
+            background: rgba(235, 255, 252, 0.95);
+            border: 2px solid rgba(23, 162, 162, 0.4);
+            color: #0b4f3f;
+            padding: 18px;
+            border-radius: 26px;
+            font-size: 1.15rem;
+            direction: rtl;
+            box-shadow: inset 0 0 0 1px rgba(53, 194, 255, 0.18);
+            resize: none;
+        }
+
+        .controls {
+            margin-top: 24px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #17a2a2, #35c2ff);
+            color: var(--white);
+            border: none;
+            padding: 16px 24px;
+            margin: 10px;
+            border-radius: 18px;
+            cursor: pointer;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 16px 30px rgba(23, 162, 162, 0.18);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 35px rgba(23, 162, 162, 0.22);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 18px;
+            background: radial-gradient(circle at top left, rgba(255,255,255,0.25), transparent 45%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        button:hover::after { opacity: 1; }
+
+        .back-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(255,255,255,0.7);
+            color: var(--text-secondary);
+            z-index: 10;
+            border: 1px solid rgba(23, 162, 162, 0.22);
+            backdrop-filter: blur(10px);
+        }
+
+        .home-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.85);
+            border: 1px solid rgba(23, 162, 162, 0.24);
+            border-radius: 16px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 10px 20px rgba(23, 162, 162, 0.16);
+        }
+
+        .home-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .telegram-link {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.92);
+            border-radius: 16px;
+            border: 1px solid rgba(23, 162, 162, 0.24);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 24px rgba(23, 162, 162, 0.16);
+            z-index: 11;
+        }
+
+        .telegram-link svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .fill-bank-button {
+            background: linear-gradient(135deg, #ffb347, #ffcc33);
+            color: #14312f;
+            border: none;
+            border-radius: 22px;
+            padding: 16px 20px;
+            box-shadow: 0 14px 30px rgba(255, 140, 50, 0.25);
+            font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+            min-width: 130px;
+            cursor: pointer;
+        }
+
+        .fill-bank-button:hover {
+            background: linear-gradient(135deg, #ffd57f, #ffdf76);
+        }
+
+        .fill-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .display-box {
+            font-size: clamp(2.2rem, 4vw, 3.4rem);
+            font-weight: 900;
+            margin: 24px 0;
+            min-height: 140px;
+            color: var(--text-color);
+            direction: rtl;
+            padding: 24px 26px;
+            border-radius: 32px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(212, 255, 250, 0.96));
+            border: 1px solid rgba(23, 162, 162, 0.28);
+            box-shadow: 0 15px 40px rgba(29, 87, 91, 0.08);
+            text-shadow: 0 0 8px rgba(255,255,255,0.6);
+        }
+
+        .fill-input {
+            width: 120px;
+            min-width: 90px;
+            padding: 14px 16px;
+            text-align: center;
+            border: 2px solid rgba(255, 140, 50, 0.35);
+            border-radius: 18px;
+            font-weight: 800;
+            color: #14312f;
+            background: rgba(255, 250, 240, 0.98);
+            box-shadow: inset 0 0 0 1px rgba(255, 182, 121, 0.16);
+        }
+
+        .fill-input.correct {
+            border-color: #17a253;
+            background: rgba(170, 255, 200, 0.95);
+        }
+
+        .fill-input.wrong {
+            border-color: #d02020;
+            background: rgba(255, 225, 225, 0.96);
+        }
+
+        .counter-box {
+            width: 92%;
+            padding: 24px 26px;
+            background: linear-gradient(135deg, rgba(53, 194, 255, 0.16), rgba(23, 162, 162, 0.18));
+            border: 2px solid rgba(53, 194, 255, 0.28);
+            border-radius: 28px;
+            margin-bottom: 18px;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 900;
+            color: #055c59;
+            text-shadow: 0 0 10px rgba(255,255,255,0.55);
+            box-shadow: 0 16px 38px rgba(23, 162, 162, 0.14);
+            line-height: 1.05;
+        }
+
+        .subtitle-overlay {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 28px;
+            background: rgba(10, 50, 50, 0.08);
+            border: 1px solid rgba(23,162,162,0.12);
+            padding: 10px 18px;
+            border-radius: 14px;
+            color: #053938;
+            font-weight: 700;
+            font-size: 1.05rem;
+            max-width: 92%;
+            text-align: center;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 8px 30px rgba(23,162,162,0.06);
+            display: none;
+        }
+
+        .translation-popup {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.98);
+            border: 1px solid rgba(23,162,162,0.24);
+            border-radius: 18px;
+            padding: 14px 18px;
+            color: #054a42;
+            min-width: 220px;
+            max-width: 92%;
+            box-shadow: 0 18px 38px rgba(23,162,162,0.18);
+            z-index: 20;
+            text-align: center;
+            display: none;
+            line-height: 1.4;
+        }
+
+        .translation-word {
+            cursor: pointer;
+            display: inline-block;
+            border-radius: 10px;
+            padding: 2px 6px;
+            margin: 2px 1px;
+            transition: background 0.2s ease;
+        }
+
+        .translation-word:hover {
+            background: rgba(23,162,162,0.14);
+        }
+
+        .fill-bank-button,
+        .word-brick,
+        .assembled-word {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            text-align: left;
+            direction: ltr;
+            width: 92%;
+        }
+
+        .settings-grid span {
+            color: var(--text-secondary);
+            align-self: center;
+        }
+
+        input[type='number'] {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(23, 162, 162, 0.35);
+            background: rgba(255,255,255,0.95);
+            color: #0b4f3f;
+        }
+
+        .library-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 20px;
+            margin-top: 6px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #0f8d90, #18c2d2);
+        }
+
+        .library-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #ffffff;
+        }
+
+        .library-layout {
+            width: 100%;
+            max-width: 920px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 18px;
+            margin-top: 20px;
+            text-align: left;
+            direction: ltr;
+        }
+
+        .chapter-list,
+        .hadith-list {
+            background: rgba(255,255,255,0.97);
+            border: 1px solid rgba(23, 162, 162, 0.18);
+            border-radius: 24px;
+            padding: 18px;
+            min-height: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 18px 40px rgba(23, 162, 162, 0.08);
+        }
+
+        .list-title {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 14px;
+            color: #0b5760;
+        }
+
+        .list-item {
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border-radius: 16px;
+            background: rgba(23, 162, 162, 0.07);
+            border: 1px solid rgba(23, 162, 162, 0.14);
+            cursor: pointer;
+            transition: transform 0.18s ease, background 0.18s ease;
+        }
+
+        .list-item:hover {
+            transform: translateX(4px);
+            background: rgba(23, 162, 162, 0.14);
+        }
+
+        .list-item.active {
+            background: rgba(53, 194, 255, 0.16);
+            border-color: rgba(53, 194, 255, 0.26);
+        }
+
+        .hadith-item {
+            font-size: 0.97rem;
+            line-height: 1.45;
+        }
+
+        .status-bar {
+            position: absolute;
+            bottom: 16px;
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            width: 100%;
+            text-align: center;
+        }
+
+        .dev-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ff3333;
+            color: #ffffff;
+            padding: 30px 50px;
+            border-radius: 20px;
+            border: 3px solid #000000;
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .dev-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body >
+
+    <div class="app-container">
+        <button class="back-btn" id="btnBack" onclick="goBack()" style="display:none;">← Назад</button>
+        <button class="home-btn" id="btnHome" onclick="goHome()" title="Домой">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H15C14.4477 21 14 20.5523 14 20V15H10V20C10 20.5523 9.55228 21 9 21H4C3.44772 21 3 20.5523 3 20V10.5Z" fill="#0b4f3f"/>
+                <path d="M9 21V14H15V21" fill="#35c2ff"/>
+            </svg>
+        </button>
+
+        <div id="screen-home" class="screen active">
+            <a class="telegram-link" href="https://t.me/Muslim_and_IT" target="_blank" rel="noreferrer" title="Канал Telegram">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 12l19-8-4 18-5-6-3 2-1-6-6-0z" fill="#0088cc"/>
+                </svg>
+            </a>
+            <h2>السلام عليكم و رحمة الله</h2>
+            <button onclick="showScreen('screen-start')">Начать</button>
+            <button onclick="supportApp()">Поддержать</button>
+            <button onclick="showSubtitles()">Субтитры</button>
+        </div>
+
+        <div id="screen-start" class="screen">
+            <h2>Тренажер Хадисов</h2>
+            <textarea id="inputHadith" placeholder="Вставьте хадис здесь..."></textarea>
+            <button onclick="goToSettings()">Настроить обучение</button>
+            <button class="library-btn" onclick="showLibrary()" title="Открыть библиотеку хадисов">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 4H20V6H4V4ZM4 9H20V11H4V9ZM4 14H20V16H4V14ZM4 19H20V21H4V19Z"/>
+                </svg>
+                Библиотека
+            </button>
+        </div>
+
+        <div id="screen-library" class="screen">
+            <h2>Библиотека хадисов</h2>
+            <div class="library-layout">
+                <div class="chapter-list">
+                    <div class="list-title">Главы</div>
+                    <div id="chapterList"></div>
+                </div>
+                <div class="hadith-list">
+                    <div class="list-title">Хадисы</div>
+                    <div id="hadithList"></div>
+                </div>
+            </div>
+            <button onclick="showScreen('screen-start')">Закрыть библиотеку</button>
+        </div>
+
+        <div id="screen-settings" class="screen">
+            <h2>Настройки</h2>
+            <div class="settings-grid">
+                <span>Повтор (5 слов):</span>
+                <input type="number" id="repeatChunk" value="3" min="1">
+                <span>Повтор всего:</span>
+                <input type="number" id="repeatTotal" value="1" min="1">
+            </div>
+            <button onclick="saveSettings()">К выбору режима</button>
+        </div>
+
+        <div id="screen-subtitles" class="screen">
+            <h2>Субтитры</h2>
+            <p>проект создан с помощью АЛЛАХа в (дата)  Юнусом ибн Умаром , Ибрахиму Абу Дарде Абу Дуджане в качестве подарка и запрещено его продовать </p>
+        
+            <button onclick="toggleSubtitlesEnable()">Включить/Выключить</button>
+            <p>Статус: <strong id="subStatus">выкл</strong></p>
+            <button onclick="showScreen('screen-home')">Назад</button>
+        </div>
+
+        <div id="screen-support" class="screen">
+            <h2>Поддержать проект</h2>
+            <p>Спасибо за желание поддержать проект — ссылка на оплату появится здесь.</p>
+            <button onclick="openSupportLink()">Перейти к поддержке</button>
+            <button onclick="showScreen('screen-home')">Назад</button>
+        </div>
+
+        <div id="screen-modes" class="screen">
+            <h2>Выберите режим</h2>
+            <button onclick="startMode('write')">Писать</button>
+            <button onclick="startMode('learn')">Учить (по 5 слов)</button>
+            <button onclick="startMode('fill')">Вставить пропущенное</button>
+            <button onclick="showDevMessage('assemble')" style="background: #999999; cursor: not-allowed; opacity: 0.7;">Собрать хадис (в степени разработки)</button>
+            <button onclick="showDevMessage()" style="background: #999999; cursor: not-allowed; opacity: 0.7;">Переводить</button>
+        </div>
+
+        <div id="screen-fill" class="screen">
+            <h2>Вставь пропущенные слова</h2>
+            <div id="fillTextContainer" class="display-box" style="white-space: normal; text-align: right; line-height: 1.6; padding: 20px;"></div>
+            <div id="fillBank" class="fill-row"></div>
+            <div class="controls">
+                <button onclick="checkFillAnswers()">Проверить</button>
+                <button onclick="clearFillInputs()">Очистить</button>
+                <button onclick="prepareFillMode()">Новый вариант</button>
+            </div>
+            <button onclick="showScreen('screen-modes')">Назад</button>
+        </div>
+
+        <div id="screen-practice" class="screen" onclick="handleTap()">
+            <div class="counter-box" id="bigCounter">Готово к практике</div>
+            <div id="progressInfo" style="font-size: 0.95rem; margin-bottom: 10px; color: #0f6d9d;"></div>
+            <div class="display-box" id="mainDisplay"></div>
+            <p id="subInfo">Нажмите на экран для перехода</p>
+            <div id="subtitleOverlay" class="subtitle-overlay"></div>
+        </div>
+
+        <div id="screen-translate" class="screen">
+            <h2>Режим перевода</h2>
+            <div class="display-box" id="translateWordsContainer" style="direction: rtl; text-align: right; white-space: normal; line-height: 1.7;"></div>
+            <div id="translationPopup" class="translation-popup">Нажмите слово для перевода</div>
+            <button onclick="showScreen('screen-modes')">Назад</button>
+        </div>
+
+        <div id="devMessageBox" class="dev-message">В СТАДИИ РАЗРАБОТКИ</div>
+
+        
+    </div>
+
+<script>
+    let hadithText = "";
+    let words = [];
+    let chunks = []; // Группы по 5 слов
+    let currentMode = "";
+    let state = {
+        chunkIdx: 0,
+        wordIdx: 0,
+        repeatCount: 0,
+        totalCycle: 0
+    };
+
+    const fillState = {
+        indices: [],
+        bankWords: [],
+        activeInput: null
+    };
+
+    // Глобальные настройки
+    let config = {
+        repeatChunk: 3,
+        repeatTotal: 1
+    };
+
+    // Звуковой движок
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(frequency, duration = 0.12, type = 'sine') {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = type;
+        osc.frequency.value = frequency;
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        gain.gain.value = 0.001;
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.15, audioContext.currentTime + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+        osc.stop(audioContext.currentTime + duration + 0.02);
+    }
+
+    function playEffect(name) {
+        if (!audioContext) return;
+        if (audioContext.state === 'suspended') audioContext.resume();
+        switch (name) {
+            case 'click': return playTone(520, 0.08, 'triangle');
+            case 'confirm': return playTone(720, 0.16, 'sawtooth');
+            case 'tap': return playTone(380, 0.1, 'square');
+            case 'alert': return playTone(220, 0.18, 'sine');
+            default: return playTone(420, 0.1, 'triangle');
+        }
+    }
+
+    // Навигация по экранам
+    function showScreen(id) {
+        playEffect('click');
+        // Try to enter fullscreen on user-triggered navigation (works when called from a click)
+        enterFullscreen();
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('btnBack').style.display = (id === 'screen-home' || id === 'screen-start') ? 'none' : 'block';
+        document.getElementById('btnHome').style.display = (id === 'screen-home') ? 'none' : 'flex';
+    }
+
+    function enterFullscreen() {
+        try {
+            if (document.fullscreenElement) return;
+            const el = document.documentElement;
+            const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+            if (req) req.call(el);
+        } catch (e) {
+            // ignore: some browsers block fullscreen without a direct user gesture
+            console.warn('Fullscreen request failed:', e);
+        }
+    }
+
+    function goHome() {
+        playEffect('click');
+        showScreen('screen-home');
+    }
+    
+    function supportApp() {
+        playEffect('click');
+        showScreen('screen-support');
+    }
+    
+    function showSubtitles() {
+        playEffect('tap');
+        showScreen('screen-subtitles');
+    }
+    
+    // Subtitles state
+    let subtitlesEnabled = false;
+    function toggleSubtitlesEnable() {
+        subtitlesEnabled = !subtitlesEnabled;
+        document.getElementById('subStatus').innerText = subtitlesEnabled ? 'вкл' : 'выкл';
+        const overlay = document.getElementById('subtitleOverlay');
+        if (subtitlesEnabled) overlay.style.display = 'block';
+        else overlay.style.display = 'none';
+        playEffect('click');
+        // Return to previous screen
+        showScreen('screen-home');
+    }
+    
+    function openSupportLink() {
+        playEffect('confirm');
+        // placeholder - replace with real link later
+        window.open('about:blank', '_blank');
+        alert('Откроется страница поддержки (пока заглушка).');
+    }
+
+    function goToSettings() {
+        hadithText = document.getElementById('inputHadith').value.trim();
+        if (!hadithText) {
+            playEffect('alert');
+            return alert("Сначала введи текст!");
+        }
+        playEffect('click');
+        showScreen('screen-settings');
+    }
+
+    function saveSettings() {
+        config.repeatChunk = parseInt(document.getElementById('repeatChunk').value);
+        config.repeatTotal = parseInt(document.getElementById('repeatTotal').value);
+        
+        // Подготовка данных
+        words = hadithText.split(/\s+/);
+        chunks = [];
+        for (let i = 0; i < words.length; i += 5) {
+            chunks.push(words.slice(i, i + 5).join(" "));
+        }
+        playEffect('confirm');
+        showScreen('screen-modes');
+    }
+
+    const hadithLibrary = [
+        {
+            chapter: "Глава 1: Вступление",
+            hadiths: [
+                "Хадис 1: عَنْ أَبِي هُرَيْرَةَ – رَضِيَ اللهُ عَنْهُ – قَالَ: قَالَ رَسُولُ اللَّهِ – صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ: \"مَنْ كَذَبَ عَلَيَّ مُتَعَمِّدًا، فَلْيَتَبَوَّأْ مَقْعَدَهُ مِنَ النَّارِ"
+            ]
+        },
+        {
+            chapter: "Глава 2: كتاب الإيمان (Книга веры)",
+            hadiths: [
+                "Хадис 1: عَنِ ابْنِ عُمَرَ رَضِيَ اللَّهُ عَنْهُمَا قَالَ: قَالَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ: \"بُنِيَ الْإِسْلَامُ عَلَى خَمْسٍ: شَهَادَةِ أَنْ لَا إِلَهَ إِلَّا اللَّهُ، وَأَنَّ مُحَمَّدًا رَسُولُ اللَّهِ، وَإِقَامِ الصَّلَاةِ، وَإِيتَاءِ الزَّكَاةِ، وَالْحَجِّ، وَصَوْمِ رَمَضَانَ\".",
+                "Хадис 2: عَنِ ابْنِ عُمَرَأَنَّ رَسُولَ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ قَالَ: \"أُمِرْتُ أَنْ أُقَاتِلَ النَّاسَ، حَتَّى يَشْهَدُوا أَنْ لَا إِلَهَ إِلَّا اللَّهُ، وَأَنَّ مُحَمَّدًا رَسُولُ اللَّهِ، وَيُقِيمُوا الصَّلَاةَ، وَيُؤْتُوا الزَّكَاةَ، فَإِذَا فَعَلُوا ذَلِكَ عَصَمُوا مِنِّي دِمَاءَهُمْ وَأَمْوَالَهُمْ، إِلَّا بِحَقِّ الْإِسْلَامِ، وَحِسَابُهُمْ عَلَى اللَّهِ\".",
+                "Хадис 3: عَنْ عُبَادَةَ بنِ الصَّامِتِ رَضِيَ اللَّهُ عَنْهُ، عَنِ النَّبِيِّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ قَالَ: \"مَنْ شَهِدَ أَنْ لَا إِلَهَ إِلَّا اللَّهُ، وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ، وَأَنَّ عِيسَى عَبْدُ اللَّهِ وَرَسُولُهُ وَكَلِمَتُهُ أَلْقَاهَا إِلَى مَرْيَمَ وَرُوحٌ مِنْهُ، وَالْجَنَّةُ حَقٌّ، وَالنَّارُ حَقٌّ، أَدْخَلَهُ اللَّهُ الْجَنَّةَ عَلَى مَا كَانَ مِنَ الْعَمَلِ\".",
+                "Хадис 4: عَنْ أَنَسِ بنِ مالكٍ رضي الله عنه، عَنِ النَّبِيِّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ، قَالَ: \"ثَلَاثٌ مَنْ كُنَّ فِيهِ وَجَدَ حَلَاوَةَ الْإِيمَانِ: أَنْ يَكُونَ اللَّهُ وَرَسُولُهُ أَحَبَّ إِلَيْهِ مِمَّا سِوَاهُمَا، وَأَنْ يُحِبَّ الْمَرْءَ لَا يُحِبُّهُ إِلَّا لِلَّهِ، وَأَنْ يَكْرَهَ أَنْ يَعُودَ فِي الْكُفْرِ كَمَا يَكْرَهُ أَنْ يُقْذَفَ فِي النَّارِ\".",
+                "Хадис 5: عَنْ أَنَسٍ قَالَ – رضي الله عنه: قَالَ النَّبِيُّ – صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ: \"لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى أَكُونَ أَحَبَّ إِلَيْهِ مِنْ وَالِدِهِ وَوَلَدِهِ، وَالنَّاسِ أَجْمَعِينَ\".",
+                "Хадис 6: عَنْ أَنَسٍ – رضي الله عنه – عَنِ النَّبِيِّ – صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ – قَالَ: \"لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ\".",
+                "Хадис 7: عَنْ أَبِي هُرَيْرَةَ – رضي الله عنه – عَنِ النَّبِيِّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ قَالَ: \"آيَةُ الْمُنَافِقِ ثَلَاثٌ: إِذَا حَدَّثَ كَذَبَ، وَإِذَا وَعَدَ أَخْلَفَ، وَإِذَا اؤْتُمِنَ خَانَ\".",
+                "Хадис 8: عَنْ عَبْدِ اللَّهِ بْنِ عُمَرَ – رَضِيَ اللَّهُ عَنْهُمَا – أَنَّ رَسُولَ اللَّهِ – صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ – قَالَ: \"أَيُّمَا رَجُلٌ قَالَ لِأَخِيهِ: يَا كَافِرُ، فَقَدْ بَاءَ بِهَا أَحَدُهُمَا\".",
+                "Хадис 9: عَنْ عَبْدِ اللَّهِ ابن مسعود، رضي الله عنه، قَالَ: قَالَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ: \"سِبَابُ الْمُسْلِمِ فُسُوقٌ، وَقِتَالُهُ كُفْرٌ\".",
+                "Хадис 10: عن أَنَسٍ، رضي الله عنه، عَنِ النَّبِيِّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ قَالَ: \"آيَةُ الْإِيمَانِ حُبُّ الْأَنْصَارِ، وَآيَةُ النِّفَاقِ بُغْضُ الْأَنْصَارِ\".",
+                "Хадис 11: عَنْ عَبْدِ اللَّهِ ابنِ مَسْعُودٍ، رَضِيَ اللَّهُ عَنْهُ، قَالَ: قَالَ رَسُولُ اللَّهِ، صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ: \"مَنْ مَاتَ يُشْرِكُ بِاللَّهِ شَيْئًا دَخَلَ النَّارَ\".",
+                "Хадис 12: عَنْ ابنِ عمرَ، رَضِيَ اللَّهُ عَنْهُما، عَنِ النَّبِيِّ، صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ، قَالَ: \"مَنْ حَمَلَ عَلَيْنَا السِّلَاحَ فَلَيْسَ مِنَّا\".",
+                "Хадис 13: عَنْ عَبْدِ اللَّهِ، رَضِيَ اللَّهُ عَنْهُ، عَنِ النَّبِيِّ، صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ، قَالَ: \"لَيْسَ مِنَّا مَنْ ضَرَبَ الْخُدُودَ، وَشَقَّ الْجُيُوبَ، وَدَعَا بِدَعْوَى الْجَاهِلِيَّةِ\".",
+                "Хадис 14: عن حُذَيْفَةَ، رضي الله عنه، أَنَّهُ قال: سَمِعْتُ النَّبِيَّ، صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ، يَقُولُ: \"لَا يَدْخُلُ الْجَنَّةَ قَتَّاتٌ\".",
+                "Хадис 15: عن حُذَيْفَةَ، رضي الله عنه، أَنَّهُ قال: سَمِعْتُ النَّبِيَّ، صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ، يَقُولُ: \"لَا يَدْخُلُ الْجَنَّةَ قَتَّاتٌ\".",
+                "Хадис 16: عن عَبْدِ اللَّهِ بْنِ عَمْرٍو، رَضِيَ اللَّهُ عَنْهُمَا، قَالَ: سَمِعْتُ النَّبِيَّ، صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ، يَقُولُ: \"مَنْ قُتِلَ دُونَ مَالِهِ فَهُوَ شَهِيدٌ\".",
+                "Хадис 17: عَنْ أَبِي هُرَيْرَةَ، رَضِيَ اللَّهُ عَنْهُ، أَنَّ رَسُولَ اللَّهِ، صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ، قَالَ: \"إِنَّ الْإِيمَانَ لَيَأْرِزُ إِلَى الْمَدِينَةِ كَمَا تَأْرِزُ الْحَيَّةُ إِلَى جُحْرِهَا\".",
+                "Хадис 18: عن أَبِي هُرَيْرَةَ، رضي الله عنه، قَالَ: قَالَ رَسُولُ اللَّهِ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ: \"كَيْفَ أَنْتُمْ إِذَا نَزَلَ ابْنُ مَرْيَمَ فِيكُمْ وَإِمَامُكُمْ مِنْكُمْ؟\".",
+                "Хадис 19: عن أَبِي هُرَيْرَةَ – رضي الله عنه – قَالَ: قَالَ رَسُولُ اللَّهِ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ: \"لِكُلِّ نَبِيٍّ دَعْوَةٌ، فَأُرِيدُ إِنْ شَاءَ اللَّهُ أَنْ أَخْتَبِيَ دَعْوَتِي شَفَاعَةً لِأُمَّتِي يَوْمَ الْقِيَامَةِ\"."
+            ]
+        },
+        {
+            chapter: "Глава 3: كتاب اللباس والزينة (Книга одежды и украшения)",
+            hadiths: [
+                "Хадис 203: عَنْ أُمِّ سَلَمَةَ زَوْجِ النَّبِيِّ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ - أَنَّ رَسُولَ اللَّهِ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ - قَالَ: \"الَّذِي يَشْرَبُ فِي إِنَاءِ الْفِضَّةِ إِنَّمَا يُجَرْجِرُ فِي بَطْنِهِ نَارَ جَهَنَّمَ\".",
+                "Хадис 204: عَنْ أَنَسٍ، رضي الله عنه، قَالَ: قَالَ - رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ: \"مَنْ لَبِسَ الْحَرِيرَ فِي الدُّنْيَا لَمْ يَلْبَسْهُ فِي الْآخِرَةِ\".",
+                "Хадис 205: عَنْ أَبِي هُرَيْرَةَ ، رضي الله عنه، أَنَّ رَسُولَ اللَّهِ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ -قَالَ: \"لَا يَنْظُرُ اللَّهُ يَوْمَ الْقِيَامَةِ إِلَى مَنْ جَرَّ إِزَارَهُ بَطَرًا\".",
+                "Хадис 206: عَنْ أَبِي هُرَيْرَةَ ، رضي الله عنه، أَنَّ رَسُولَ اللَّهِ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ - قَالَ: \"لَا يَمْشِي أَحَدُكُمْ فِي نَعْلٍ وَاحِدَةٍ، لِيُحْفِهِمَا أَوْ لِيُنْعِلْهُمَا جَمِيعًا\".",
+                "Хадис 207: عَنْ أَنَسٍ قَالَ : نَهَى النَّبِيُّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ أَنْ يَتَزَعْفَرَ الرَّجُلُ.",
+                "Хадис 206: عَنْ أَبِي هُرَيْرَةَ ، رضي الله عنه، أَنَّ رَسُولَ اللَّهِ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ - قَالَ: \"لَا يَمْشِي أَحَدُكُمْ فِي نَعْلٍ وَاحِدَةٍ، لِيُحْفِهِمَا أَوْ لِيُنْعِلْهُمَا جَمِيعًا\".",
+                "Хадис 208: عن أبي هُرَيْرَةَ، رَضِيَ اللَّهُ عَنْهُ، قَالَ: إِنَّ رَسُولَ اللَّهِ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ - قَالَ: \"إِنَّ الْيَهُودَ وَالنَّصَارَى لَا يَصْبُغُونَ فَخَالِفُوهُمْ\".",
+                "Хадис 209: عن أبي طَلْحَةَ، رضي الله عنه، يَقُولُ: سَمِعْتُ رَسُولَ اللَّهِ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ - يَقُولُ: \"لَا تَدْخُلُ الْمَلَائِكَةُ بَيْتًا فِيهِ كَلْبٌ، وَلَا صُورَةُ تَمَاثِيلَ\".",
+                "Хадис 210: عَنْ نَافِعٍ، رحمه الله، أَنَّ ابْنَ عُمَرَ، رضي الله عنهما، أَخْبَرَهُ، أَنَّ رَسُولَ اللَّهِ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ - قَالَ: \"الَّذِينَ يَصْنَعُونَ الصُّوَرَ يُعَذَّبُونَ يَوْمَ الْقِيَامَةِ يُقَالُ لَهُمْ : أَحْيُوا مَا خَلَقْتُمْ\".",
+                "Хадис 211: عن عَبْدِ اللَّهِ، رضي الله عنه، قَالَ: سَمِعْتُ النَّبِيَّ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ - يَقُولُ: \"إِنَّ أَشَدَّ النَّاسِ عَذَابًا عِنْدَ اللَّهِ يَوْمَ الْقِيَامَةِ الْمُصَوِّرُونَ\".",
+                "Хадис 212: عن ابْن عُمَرَ - رَضِيَ اللَّهُ عَنْهُمَا - يَقُولُ: سَمِعْتُ رَسُولَ اللَّهِ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ - يَنْهَى عَنِ الْقَزَعِ.",
+                "Хадис 213: عَنْ أَسْمَاءَ، رضي الله عنها، أَنَّ امْرَأَةً قَالَتْ: يَا رَسُولَ اللَّهِ، إِنَّ لِي ضَرَّةً، فَهَلْ عَلَيَّ جُنَاحٌ إِنْ تَشَبَّعْتُ مِنْ زَوْجِي غَيْرَ الَّذِي يُعْطِينِي؟ فَقَالَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ: \"الْمُتَشَبِّعُ بِمَا لَمْ يُعْطَ كَلَابِسِ ثَوْبَيْ زُورٍ\"."
+            ]
+        }
+    ];
+
+    let selectedChapterIndex = 0;
+
+    function showLibrary() {
+        populateLibrary();
+        showScreen('screen-library');
+    }
+
+    function populateLibrary() {
+        const chapterList = document.getElementById('chapterList');
+        chapterList.innerHTML = '';
+        hadithLibrary.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'list-item' + (index === selectedChapterIndex ? ' active' : '');
+            div.innerText = item.chapter;
+            div.onclick = () => selectChapter(index);
+            chapterList.appendChild(div);
+        });
+        selectChapter(selectedChapterIndex);
+    }
+
+    function selectChapter(index) {
+        selectedChapterIndex = index;
+        const chapterItems = document.querySelectorAll('#chapterList .list-item');
+        chapterItems.forEach((item, idx) => item.classList.toggle('active', idx === index));
+        const hadithList = document.getElementById('hadithList');
+        hadithList.innerHTML = '';
+        const selected = hadithLibrary[index] || { hadiths: [] };
+        if (selected.hadiths.length === 0) {
+            hadithList.innerHTML = '<div class="list-item">Пусто — добавьте главы и хадисы позже.</div>';
+            return;
+        }
+        selected.hadiths.forEach((raw, idx) => {
+            const hadith = parseHadith(raw, idx + 1);
+            const div = document.createElement('div');
+            div.className = 'list-item hadith-item';
+            div.innerText = `№${hadith.number}`;
+            div.onclick = () => selectHadith(hadith);
+            hadithList.appendChild(div);
+        });
+    }
+
+    function parseHadith(raw, fallbackNumber) {
+        const match = raw.match(/^Хадис\s*(\d+)\s*[:\-]\s*(.*)$/iu);
+        return {
+            number: match ? parseInt(match[1], 10) : fallbackNumber,
+            text: match ? match[2] : raw
+        };
+    }
+
+    function selectHadith(hadith) {
+        document.getElementById('inputHadith').value = hadith.text;
+        playEffect('confirm');
+        showScreen('screen-start');
+    }
+
+    const defaultTranslations = {
+        "хадис": "hadith",
+        "пример": "example",
+        "текста": "text",
+        "главы": "chapter",
+        "еще": "more",
+        "один": "one",
+        "благословение": "blessing",
+        "вера": "faith",
+        "мудрость": "wisdom",
+        "выберите": "choose",
+        "режим": "mode",
+        "переводить": "translate"
+    };
+    let translationMap = { ...defaultTranslations };
+    let translationPopupTimeout = null;
+
+    async function loadBaranovDictionary() {
+        try {
+            const response = await fetch('Baranov_Project.dsl');
+            if (!response.ok) throw new Error('Файл не доступен');
+            const text = await response.text();
+            const data = parseBaranovDSL(text);
+
+            if (Object.keys(data).length > 0) {
+                translationMap = { ...translationMap, ...data };
+                console.log('Словарь Baranov_Project.dsl успешно загружен и объединён!');
+            } else {
+                console.warn('Файл Baranov_Project.dsl загружен, но переводов не найдено.');
+            }
+        } catch (err) {
+            console.warn('Не удалось загрузить словарь Baranov_Project.dsl:', err);
+        }
+    }
+
+    function parseBaranovDSL(text) {
+        const lines = text.split(/\r?\n/);
+        const dictionary = {};
+        let currentKey = null;
+        let currentLines = [];
+
+        const flushEntry = () => {
+            if (!currentKey || currentLines.length === 0) return;
+            const joined = currentLines.join(' ');
+            const cleaned = stripDSLMarkup(joined).trim();
+            if (cleaned) {
+                dictionary[currentKey] = cleaned;
+            }
+        };
+
+        for (let rawLine of lines) {
+            const line = rawLine.replace(/\uFEFF/g, '');
+            if (!line.trim() || /^\s*#/.test(line)) continue;
+
+            if (/^\S/.test(line)) {
+                flushEntry();
+                currentKey = line.trim();
+                currentLines = [];
+            } else if (currentKey) {
+                currentLines.push(line.trim());
+            }
+        }
+        flushEntry();
+        return dictionary;
+    }
+
+    function stripDSLMarkup(str) {
+        return str
+            .replace(/\[\/?.+?\]/g, ' ')
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .replace(/\u00A0/g, ' ')
+            .trim();
+    }
+
+    function normalizeWord(raw) {
+        return raw.replace(/[.,!?;:"'«»()\[\]]/g, '').toLowerCase();
+    }
+
+    function findTranslation(word) {
+        const key = normalizeWord(word);
+        return translationMap[key] || null;
+    }
+
+    function showTranslationMessage(text) {
+        const popup = document.getElementById('translationPopup');
+        popup.innerText = text;
+        popup.style.display = 'block';
+        clearTimeout(translationPopupTimeout);
+        translationPopupTimeout = setTimeout(() => { popup.style.display = 'none'; }, 3500);
+    }
+
+    function showTranslation(word) {
+        const popup = document.getElementById('translationPopup');
+        const translation = findTranslation(word);
+        popup.innerText = translation ? `${word} → ${translation}` : `${word} — перевод не найден`;
+        popup.style.display = 'block';
+        clearTimeout(translationPopupTimeout);
+        translationPopupTimeout = setTimeout(() => { popup.style.display = 'none'; }, 3500);
+    }
+
+    function prepareTranslateMode() {
+        const container = document.getElementById('translateWordsContainer');
+        container.innerHTML = '';
+        const cleanWords = hadithText.split(/\s+/).filter(Boolean);
+        cleanWords.forEach((word) => {
+            const span = document.createElement('span');
+            span.className = 'translation-word';
+            span.innerText = word;
+            span.onclick = (event) => {
+                event.stopPropagation();
+                showTranslation(word);
+            };
+            container.appendChild(span);
+            container.appendChild(document.createTextNode(' '));
+        });
+        showTranslationMessage('Нажмите слово для перевода');
+    }
+
+    function startMode(mode) {
+        currentMode = mode;
+        state = { chunkIdx: 0, wordIdx: 0, repeatCount: 0, totalCycle: 0 };
+        playEffect('tap');
+        if (mode === 'translate') {
+            prepareTranslateMode();
+            showScreen('screen-translate');
+            return;
+        }
+        if (mode === 'fill') {
+            prepareFillMode();
+            showScreen('screen-fill');
+            return;
+        }
+        showScreen('screen-practice');
+        updatePracticeDisplay();
+    }
+
+    function showDevMessage(mode) {
+        playEffect('alert');
+        const msgBox = document.getElementById('devMessageBox');
+        msgBox.innerText = 'В СТАДИИ РАЗРАБОТКИ';
+        msgBox.classList.add('show');
+        setTimeout(() => { msgBox.classList.remove('show'); }, 3000);
+    }
+
+    function prepareFillMode() {
+        words = hadithText.split(/\s+/).filter(Boolean);
+        if (words.length === 0) {
+            playEffect('alert');
+            return alert('Сначала добавь текст хадиса.');
+        }
+        const count = Math.min(4, Math.max(1, Math.floor(words.length / 4)));
+        const indices = [];
+        const spacing = Math.max(1, Math.floor(words.length / (count + 1)));
+        for (let i = spacing; indices.length < count && i < words.length - 1; i += spacing) {
+            const clean = words[i].replace(/[.,!?;:"'«»()\[\]]/g, '');
+            if (!indices.includes(i) && clean.length > 1) {
+                indices.push(i);
+            }
+        }
+        if (indices.length === 0 && words.length > 1) {
+            indices.push(words.length - 1);
+        }
+        fillState.indices = indices;
+        fillState.bankWords = indices.map(i => words[i]);
+        fillState.activeInput = null;
+        renderFillTask();
+    }
+
+    function renderFillTask() {
+        const container = document.getElementById('fillTextContainer');
+        container.innerHTML = '';
+        fillState.indices.sort((a, b) => a - b);
+        words.forEach((word, index) => {
+            if (fillState.indices.includes(index)) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'fill-input';
+                input.dataset.index = index;
+                input.placeholder = '...';
+                input.autocomplete = 'off';
+                input.addEventListener('focus', () => { fillState.activeInput = index; });
+                input.addEventListener('input', () => { input.value = input.value.replace(/\s+/g, ''); });
+                container.appendChild(input);
+            } else {
+                const span = document.createElement('span');
+                span.innerText = word;
+                container.appendChild(span);
+            }
+            container.appendChild(document.createTextNode(' '));
+        });
+
+        const bank = document.getElementById('fillBank');
+        bank.innerHTML = '';
+        const shuffled = shuffleArray(fillState.bankWords.slice());
+        shuffled.forEach(word => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'fill-bank-button';
+            btn.innerText = word;
+            btn.onclick = () => insertFillWord(word);
+            bank.appendChild(btn);
+        });
+    }
+
+    function insertFillWord(word) {
+        const inputs = Array.from(document.querySelectorAll('#fillTextContainer input'));
+        let target = inputs.find(input => input.dataset.index == fillState.activeInput);
+        if (!target) target = inputs.find(input => !input.value.trim());
+        if (!target) return;
+        target.value = word;
+        target.classList.remove('wrong', 'correct');
+    }
+
+    function clearFillInputs() {
+        document.querySelectorAll('#fillTextContainer input').forEach(input => {
+            input.value = '';
+            input.classList.remove('wrong', 'correct');
+        });
+        fillState.activeInput = null;
+    }
+
+    function checkFillAnswers() {
+        let correctCount = 0;
+        const inputs = Array.from(document.querySelectorAll('#fillTextContainer input'));
+        inputs.forEach(input => {
+            const idx = parseInt(input.dataset.index, 10);
+            const expected = normalizeWord(words[idx]);
+            const answer = normalizeWord(input.value || '');
+            if (answer === expected && answer !== '') {
+                input.classList.add('correct');
+                input.classList.remove('wrong');
+                correctCount += 1;
+            } else {
+                input.classList.add('wrong');
+                input.classList.remove('correct');
+            }
+        });
+        if (correctCount === inputs.length) {
+            playEffect('confirm');
+            alert('Все слова вставлены верно! Отличная работа.');
+        } else {
+            playEffect('alert');
+            alert(`Правильно: ${correctCount} из ${inputs.length}.`);
+        }
+    }
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function goBack() {
+        playEffect('click');
+        const active = document.querySelector('.screen.active').id;
+        if (active === 'screen-practice' || active === 'screen-translate' || active === 'screen-fill') showScreen('screen-modes');
+        else if (active === 'screen-modes') showScreen('screen-settings');
+        else showScreen('screen-start');
+    }
+
+    // Логика переключения по тапу
+    function handleTap() {
+        playEffect('tap');
+        if (currentMode === 'write') {
+            state.wordIdx++;
+            if (state.wordIdx >= words.length) finish();
+        } 
+        else if (currentMode === 'learn') {
+            state.repeatCount++;
+            if (state.repeatCount >= config.repeatChunk) {
+                state.repeatCount = 0;
+                state.chunkIdx++;
+            }
+            if (state.chunkIdx >= chunks.length) {
+                state.chunkIdx = 0;
+                state.totalCycle++;
+                if (state.totalCycle >= config.repeatTotal) finish();
+            }
+        }
+        updatePracticeDisplay();
+    }
+
+    function updatePracticeDisplay() {
+        const display = document.getElementById('mainDisplay');
+        const prog = document.getElementById('progressInfo');
+        const counter = document.getElementById('bigCounter');
+
+        if (currentMode === 'write') {
+            const txt = words[state.wordIdx] || "";
+            display.innerText = txt;
+            prog.innerText = `Слово: ${state.wordIdx + 1} / ${words.length}`;
+            counter.innerText = `Слово ${state.wordIdx + 1} из ${words.length}`;
+            if (subtitlesEnabled) document.getElementById('subtitleOverlay').innerText = txt;
+        } 
+        else if (currentMode === 'learn') {
+            const txt = chunks[state.chunkIdx] || "";
+            display.innerText = txt;
+            prog.innerText = `Группа: ${state.chunkIdx + 1}/${chunks.length} | Повтор: ${state.repeatCount + 1}/${config.repeatChunk}`;
+            counter.innerText = `Группа ${state.chunkIdx + 1} из ${chunks.length}`;
+            if (subtitlesEnabled) document.getElementById('subtitleOverlay').innerText = txt;
+        }
+    }
+
+    function finish() {
+        playEffect('confirm');
+        alert("Задание выполнено! Отличная работа.");
+        showScreen('screen-modes');
+    }
+
+    // Переключение вида Телефон/Компьютер по клавише 'h'
+    window.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'h' && e.target.tagName !== 'TEXTAREA') {
+            document.body.classList.toggle('desktop-mode');
+            const isDesktop = document.body.classList.contains('desktop-mode');
+            document.getElementById('modeName').innerText = isDesktop ? "Компьютер" : "Телефон";
+        }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            const activeScreen = document.querySelector('.screen.active');
+            if (activeScreen && activeScreen.id !== 'screen-home') {
+                enterFullscreen();
+            }
+        }
+    });
+
+    window.addEventListener('load', loadBaranovDictionary);
+</script>
+</body>
+</html>
