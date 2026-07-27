@@ -324,6 +324,34 @@
             line-height: 1.4;
         }
 
+        .toast-popup {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%);
+            background: rgba(8, 54, 50, 0.94);
+            color: #f7fffd;
+            border-radius: 16px;
+            padding: 12px 18px;
+            min-width: 220px;
+            max-width: min(92vw, 480px);
+            box-shadow: 0 18px 38px rgba(0, 0, 0, 0.18);
+            z-index: 30;
+            text-align: center;
+            display: none;
+            line-height: 1.4;
+            font-weight: 700;
+            backdrop-filter: blur(8px);
+        }
+
+        .display-box,
+        .counter-box,
+        .subtitle-overlay,
+        .translation-popup,
+        .toast-popup {
+            unicode-bidi: plaintext;
+        }
+
         .translation-word {
             cursor: pointer;
             display: inline-block;
@@ -397,48 +425,103 @@
             direction: ltr;
         }
 
-        .chapter-list,
-        .hadith-list {
-            background: rgba(255,255,255,0.97);
-            border: 1px solid rgba(23, 162, 162, 0.18);
-            border-radius: 24px;
-            padding: 18px;
-            min-height: 320px;
-            max-height: 400px;
-            overflow-y: auto;
-            box-shadow: 0 18px 40px rgba(23, 162, 162, 0.08);
+        .library-shell {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+            min-height: 0;
         }
 
-        .list-title {
+        .library-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .library-title {
             font-size: 1rem;
             font-weight: 800;
-            margin-bottom: 14px;
+            color: #0b5760;
+            flex: 1;
+            text-align: center;
+        }
+
+        .library-back-btn {
+            background: rgba(255,255,255,0.92);
+            color: var(--text-secondary);
+            border: 1px solid rgba(23, 162, 162, 0.2);
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin: 0;
+            box-shadow: none;
+            font-size: 0.95rem;
+        }
+
+        .library-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            padding-right: 4px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .library-card {
+            width: 100%;
+            border: 1px solid rgba(23, 162, 162, 0.18);
+            border-radius: 20px;
+            padding: 16px 18px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(227, 255, 249, 0.96));
+            box-shadow: 0 14px 30px rgba(23, 162, 162, 0.08);
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            text-align: right;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            box-sizing: border-box;
+            line-height: 1.45;
+        }
+
+        .library-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 34px rgba(23, 162, 162, 0.12);
+        }
+
+        .library-card-title {
+            font-weight: 800;
+            font-size: 1rem;
             color: #0b5760;
         }
 
-        .list-item {
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            border-radius: 16px;
-            background: rgba(23, 162, 162, 0.07);
-            border: 1px solid rgba(23, 162, 162, 0.14);
-            cursor: pointer;
-            transition: transform 0.18s ease, background 0.18s ease;
+        .library-card-sub {
+            font-size: 0.92rem;
+            color: #0f6d9d;
         }
 
-        .list-item:hover {
-            transform: translateX(4px);
-            background: rgba(23, 162, 162, 0.14);
+        .library-card-meta {
+            font-size: 0.84rem;
+            color: #0d7a73;
+            opacity: 0.95;
         }
 
-        .list-item.active {
-            background: rgba(53, 194, 255, 0.16);
-            border-color: rgba(53, 194, 255, 0.26);
+        .library-hero {
+            background: linear-gradient(135deg, rgba(244, 255, 251, 0.98), rgba(214, 247, 255, 0.96));
+            border-color: rgba(53, 194, 255, 0.24);
         }
 
-        .hadith-item {
-            font-size: 0.97rem;
-            line-height: 1.45;
+        .library-empty-state {
+            padding: 18px 16px;
+            border-radius: 18px;
+            background: rgba(23, 162, 162, 0.06);
+            color: #0f6d9d;
+            text-align: center;
+            font-weight: 700;
         }
 
         .status-bar {
@@ -499,7 +582,7 @@
         <div id="screen-start" class="screen">
             <h2>Тренажер Хадисов</h2>
             <textarea id="inputHadith" placeholder="Вставьте хадис здесь..."></textarea>
-            <button onclick="goToSettings()">Настроить обучение</button>
+            <button onclick="goToModes()">Выбрать режим</button>
             <button class="library-btn" onclick="showLibrary()" title="Открыть библиотеку хадисов">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M4 4H20V6H4V4ZM4 9H20V11H4V9ZM4 14H20V16H4V14ZM4 19H20V21H4V19Z"/>
@@ -510,42 +593,26 @@
 
         <div id="screen-library" class="screen">
             <h2>Библиотека хадисов</h2>
-            <div class="library-layout">
-                <div class="chapter-list">
-                    <div class="list-title">Главы</div>
-                    <div id="chapterList"></div>
+            <div class="library-shell">
+                <div class="library-toolbar">
+                    <button id="libraryBackBtn" class="library-back-btn" onclick="goBackLibraryView()" style="display:none;">← Назад</button>
+                    <div id="libraryTitle" class="library-title">Выберите главу</div>
                 </div>
-                <div class="hadith-list">
-                    <div class="list-title">Хадисы</div>
-                    <div id="hadithList"></div>
-                </div>
+                <div id="libraryContent" class="library-content"></div>
             </div>
-            <button onclick="showScreen('screen-start')">Закрыть библиотеку</button>
+            <button onclick="closeLibrary()">Закрыть библиотеку</button>
         </div>
 
         <div id="screen-settings" class="screen">
-            <h2>Настройки</h2>
-            <div class="settings-grid">
-                <span>Повтор (5 слов):</span>
-                <input type="number" id="repeatChunk" value="3" min="1">
-                <span>Повтор всего:</span>
-                <input type="number" id="repeatTotal" value="1" min="1">
-            </div>
-            <button onclick="saveSettings()">К выбору режима</button>
+            <h2 id="settingsTitle">Настройки</h2>
+            <div id="settingsGrid" class="settings-grid"></div>
+            <button id="settingsActionBtn" onclick="saveSettings()">Начать</button>
         </div>
 
         <div id="screen-subtitles" class="screen">
             <h2>Субтитры</h2>
-            <p>Проект создан с помощью АЛЛАХа 5/1/1448 Юнусом ибн Умаром Ибрахиму Абу Дарде Абу Дуджане в качестве подарка, и запрещено его продавать.<br>
-Данное приложение создано для изучения хадисов из книги Шейха<br>
-Абу Али Мухаммада ибн Ибрахима Аль-Мисри: "300 избранных хадисов для заучивания для детей".<br>
-Добавлено только три главы, постепенно будет добавляться вся книга Шейха.<br>
-А дальше:<br>
-Вся хвала АЛЛАХу, Господу миров! И благодарю всех, кто помогал мне в этом деле. В частности:<br>
-Благодарю моего отца и мою мать в первую очередь,<br>
-затем благодарю Абу Дуджану Ибрахима,<br>
-благодарю Шамиля Сулипова.<br>
-والحمد لله رب العالمين</p>
+            <p dir="auto">проект создан с помощью АЛЛАХа в (дата)  Юнусом ибн Умаром , Ибрахиму Абу Дарде Абу Дуджане в качестве подарка и запрещено его продовать </p>
+        
             <button onclick="toggleSubtitlesEnable()">Включить/Выключить</button>
             <p>Статус: <strong id="subStatus">выкл</strong></p>
             <button onclick="showScreen('screen-home')">Назад</button>
@@ -561,7 +628,7 @@
         <div id="screen-modes" class="screen">
             <h2>Выберите режим</h2>
             <button onclick="startMode('write')">Писать</button>
-            <button onclick="startMode('learn')">Учить (по 5 слов)</button>
+            <button onclick="startMode('learn')">Учить (по предложениям)</button>
             <button onclick="startMode('fill')">Вставить пропущенное</button>
             <button onclick="showDevMessage('assemble')" style="background: #999999; cursor: not-allowed; opacity: 0.7;">Собрать хадис (в степени разработки)</button>
             <button onclick="showDevMessage()" style="background: #999999; cursor: not-allowed; opacity: 0.7;">Переводить</button>
@@ -569,7 +636,7 @@
 
         <div id="screen-fill" class="screen">
             <h2>Вставь пропущенные слова</h2>
-            <div id="fillTextContainer" class="display-box" style="white-space: normal; text-align: right; line-height: 1.6; padding: 20px;"></div>
+            <div id="fillTextContainer" class="display-box" dir="auto" style="white-space: normal; text-align: right; line-height: 1.6; padding: 20px;"></div>
             <div id="fillBank" class="fill-row"></div>
             <div class="controls">
                 <button onclick="checkFillAnswers()">Проверить</button>
@@ -580,24 +647,21 @@
         </div>
 
         <div id="screen-practice" class="screen" onclick="handleTap()">
-            <div class="counter-box" id="bigCounter">Готово к практике</div>
-            <div id="progressInfo" style="font-size: 0.95rem; margin-bottom: 10px; color: #0f6d9d;"></div>
-            <div class="display-box" id="mainDisplay"></div>
-            <p id="subInfo">Нажмите на экран для перехода</p>
-            <div id="subtitleOverlay" class="subtitle-overlay"></div>
+            <div class="counter-box" id="bigCounter" dir="auto">Готово к практике</div>
+            <div id="progressInfo" dir="auto" style="font-size: 0.95rem; margin-bottom: 10px; color: #0f6d9d;"></div>
+            <div class="display-box" id="mainDisplay" dir="auto"></div>
+            <p id="subInfo" dir="auto">Нажмите на экран для перехода</p>
+            <div id="subtitleOverlay" class="subtitle-overlay" dir="auto"></div>
         </div>
 
         <div id="screen-translate" class="screen">
             <h2>Режим перевода</h2>
-            <div class="display-box" id="translateWordsContainer" style="direction: rtl; text-align: right; white-space: normal; line-height: 1.7;"></div>
-            <div id="translationPopup" class="translation-popup">Нажмите слово для перевода</div>
+            <div class="display-box" id="translateWordsContainer" dir="auto" style="direction: rtl; text-align: right; white-space: normal; line-height: 1.7;"></div>
+            <div id="translationPopup" class="translation-popup" dir="auto">Нажмите слово для перевода</div>
             <button onclick="showScreen('screen-modes')">Назад</button>
         </div>
 
-        <div id="devMessageBox" class="dev-message">В СТАДИИ РАЗРАБОТКИ</div>
-
-        
-    </div>
+    <div id="toastPopup" class="toast-popup"></div>
 
 <script>
     let hadithText = "";
@@ -620,8 +684,11 @@
     // Глобальные настройки
     let config = {
         repeatChunk: 3,
-        repeatTotal: 1
+        repeatTotal: 1,
+        writeWordsPerStep: 1,
+        sentencesPerGroup: 1
     };
+    let selectedMode = '';
 
     // Звуковой движок
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -702,35 +769,80 @@
         showScreen('screen-home');
     }
     
+    function showToast(message, duration = 2500) {
+        const popup = document.getElementById('toastPopup');
+        if (!popup) return;
+        popup.innerText = message;
+        popup.style.display = 'block';
+        clearTimeout(window.toastTimeout);
+        window.toastTimeout = setTimeout(() => {
+            popup.style.display = 'none';
+        }, duration);
+    }
+
     function openSupportLink() {
         playEffect('confirm');
         // placeholder - replace with real link later
         window.open('about:blank', '_blank');
-        alert('Откроется страница поддержки (пока заглушка).');
+        showToast('Откроется страница поддержки (пока заглушка).');
     }
 
-    function goToSettings() {
+    function goToModes() {
         hadithText = document.getElementById('inputHadith').value.trim();
         if (!hadithText) {
             playEffect('alert');
-            return alert("Сначала введи текст!");
+            return showToast("Сначала введи текст!");
         }
         playEffect('click');
+        showScreen('screen-modes');
+    }
+
+    function showModeSettings(mode) {
+        selectedMode = mode;
+        const title = document.getElementById('settingsTitle');
+        const grid = document.getElementById('settingsGrid');
+        const actionBtn = document.getElementById('settingsActionBtn');
+
+        if (mode === 'learn') {
+            title.innerText = 'Настройки режима «Учить»';
+            grid.innerHTML = `
+                <span>Сколько предложений в группе:</span>
+                <input type="number" id="sentencesPerGroup" value="${config.sentencesPerGroup}" min="1">
+                <span>Сколько раз повторять группу:</span>
+                <input type="number" id="repeatChunk" value="${config.repeatChunk}" min="1">
+                <span>Повтор всего циклов:</span>
+                <input type="number" id="repeatTotal" value="${config.repeatTotal}" min="1">
+            `;
+            actionBtn.innerText = 'Начать обучение';
+        } else if (mode === 'write') {
+            title.innerText = 'Настройки режима «Писать»';
+            grid.innerHTML = `
+                <span>Показывать по слов:</span>
+                <input type="number" id="writeWordsPerStep" value="${config.writeWordsPerStep}" min="1" max="10">
+            `;
+            actionBtn.innerText = 'Начать писать';
+        }
+
         showScreen('screen-settings');
     }
 
     function saveSettings() {
-        config.repeatChunk = parseInt(document.getElementById('repeatChunk').value);
-        config.repeatTotal = parseInt(document.getElementById('repeatTotal').value);
-        
-        // Подготовка данных
-        words = hadithText.split(/\s+/);
-        chunks = [];
-        for (let i = 0; i < words.length; i += 5) {
-            chunks.push(words.slice(i, i + 5).join(" "));
+        if (selectedMode === 'learn') {
+            config.sentencesPerGroup = Math.max(1, parseInt(document.getElementById('sentencesPerGroup').value || '1', 10));
+            config.repeatChunk = Math.max(1, parseInt(document.getElementById('repeatChunk').value || '1', 10));
+            config.repeatTotal = Math.max(1, parseInt(document.getElementById('repeatTotal').value || '1', 10));
+            const sentences = splitSentences(hadithText);
+            chunks = [];
+            for (let i = 0; i < sentences.length; i += config.sentencesPerGroup) {
+                chunks.push(sentences.slice(i, i + config.sentencesPerGroup).join(" "));
+            }
+        } else if (selectedMode === 'write') {
+            config.writeWordsPerStep = Math.max(1, Math.min(10, parseInt(document.getElementById('writeWordsPerStep').value || '1', 10)));
+            words = hadithText.split(/\s+/).filter(Boolean);
         }
+
         playEffect('confirm');
-        showScreen('screen-modes');
+        startPractice(selectedMode);
     }
 
     const hadithLibrary = [
@@ -784,44 +896,96 @@
     ];
 
     let selectedChapterIndex = 0;
+    let libraryView = 'chapters';
 
     function showLibrary() {
+        libraryView = 'chapters';
+        selectedChapterIndex = 0;
         populateLibrary();
         showScreen('screen-library');
     }
 
+    function closeLibrary() {
+        libraryView = 'chapters';
+        showScreen('screen-start');
+    }
+
+    function goBackLibraryView() {
+        if (libraryView === 'hadiths') {
+            libraryView = 'chapters';
+            populateLibrary();
+            return;
+        }
+        closeLibrary();
+    }
+
     function populateLibrary() {
-        const chapterList = document.getElementById('chapterList');
-        chapterList.innerHTML = '';
-        hadithLibrary.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'list-item' + (index === selectedChapterIndex ? ' active' : '');
-            div.innerText = item.chapter;
-            div.onclick = () => selectChapter(index);
-            chapterList.appendChild(div);
+        const content = document.getElementById('libraryContent');
+        const title = document.getElementById('libraryTitle');
+        const backBtn = document.getElementById('libraryBackBtn');
+        content.innerHTML = '';
+
+        if (libraryView === 'chapters') {
+            title.innerText = 'Выберите главу';
+            backBtn.style.display = 'none';
+            hadithLibrary.forEach((item, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'library-card';
+                button.dir = 'auto';
+                button.innerHTML = `
+                    <div class="library-card-title">${item.chapter}</div>
+                    <div class="library-card-sub">${item.hadiths.length} хадис${item.hadiths.length === 1 ? '' : 'ов'}</div>
+                `;
+                button.onclick = () => selectChapter(index);
+                content.appendChild(button);
+            });
+            return;
+        }
+
+        title.innerText = hadithLibrary[selectedChapterIndex]?.chapter || 'Хадисы';
+        backBtn.style.display = 'block';
+
+        const selected = hadithLibrary[selectedChapterIndex] || { hadiths: [] };
+        const hero = document.createElement('div');
+        hero.className = 'library-card library-hero';
+        hero.dir = 'auto';
+        hero.innerHTML = `
+            <div class="library-card-title">${selected.chapter || 'Хадисы'}</div>
+            <div class="library-card-sub">В этой главе ${selected.hadiths.length} хадис${selected.hadiths.length === 1 ? '' : 'ов'}</div>
+            <div class="library-card-meta">Нажмите на хадис, чтобы вставить его в поле</div>
+        `;
+        content.appendChild(hero);
+
+        if (selected.hadiths.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'library-empty-state';
+            empty.innerText = 'Пусто — добавьте главы и хадисы позже.';
+            content.appendChild(empty);
+            return;
+        }
+
+        selected.hadiths.forEach((raw, idx) => {
+            const hadith = parseHadith(raw, idx + 1);
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'library-card';
+            button.dir = 'auto';
+            const parts = extractSalawat(hadith.text);
+            button.innerHTML = `
+                <div class="library-card-title">№${hadith.number}</div>
+                <div class="library-card-sub">${parts.clean}</div>
+                ${parts.salawatHtml ? `<div class="library-card-meta" style="font-size:0.82rem;color:#0f6d9d;margin-top:6px;">${parts.salawatHtml}</div>` : ''}
+            `;
+            button.onclick = () => selectHadith(hadith);
+            content.appendChild(button);
         });
-        selectChapter(selectedChapterIndex);
     }
 
     function selectChapter(index) {
         selectedChapterIndex = index;
-        const chapterItems = document.querySelectorAll('#chapterList .list-item');
-        chapterItems.forEach((item, idx) => item.classList.toggle('active', idx === index));
-        const hadithList = document.getElementById('hadithList');
-        hadithList.innerHTML = '';
-        const selected = hadithLibrary[index] || { hadiths: [] };
-        if (selected.hadiths.length === 0) {
-            hadithList.innerHTML = '<div class="list-item">Пусто — добавьте главы и хадисы позже.</div>';
-            return;
-        }
-        selected.hadiths.forEach((raw, idx) => {
-            const hadith = parseHadith(raw, idx + 1);
-            const div = document.createElement('div');
-            div.className = 'list-item hadith-item';
-            div.innerText = `№${hadith.number}`;
-            div.onclick = () => selectHadith(hadith);
-            hadithList.appendChild(div);
-        });
+        libraryView = 'hadiths';
+        populateLibrary();
     }
 
     function parseHadith(raw, fallbackNumber) {
@@ -917,6 +1081,31 @@
         return raw.replace(/[.,!?;:"'«»()\[\]]/g, '').toLowerCase();
     }
 
+    // Разбить текст на предложения.
+    // Останавливаем предложение после знаков: . ! ? : , (латинская запятая), арабская запятая (،), арабский вопрос (؟),
+    // арабский точечный знак (۞/۔ U+06D4), арабская точка с запятой (؛), многоточие … и т.п.
+    // НЕ разрезаем по кавычкам (").
+    function splitSentences(text) {
+        if (!text) return [];
+        // Набор знаков препинания, которые считаем концом предложения (без кавычки ").
+        // U+060C = Arabic comma (،), U+061B = Arabic semicolon (؛), U+061F = Arabic question mark (؟), U+06D4 = Arabic full stop (۔)
+        const re = /[^\.\!\?\:\,\u060C\u061B\u061F\u06D4\u2026"]+[\.\!\?\:\,\u060C\u061B\u061F\u06D4\u2026]?/g;
+        const matches = text.match(re);
+        if (!matches) return [text.trim()];
+        return matches.map(s => s.trim()).filter(Boolean);
+    }
+
+    // Вырезать тексты типа "رضي الله عنه" или "صلى الله عليه وسلم" и вернуть чистый текст + маленький HTML для подписи
+    function extractSalawat(text) {
+        if (!text) return { clean: '', salawatHtml: '' };
+        const salawatRegex = /(صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ|صلى الله عليه وسلم|صلعم|رَضِيَ اللهُ عَنْهُ|رضي\s*الله\s*عنه(?:ما|م|م[ا-ى]*)|رضي الله عنهما|رضي الله عنهم|رضي الله عنه)/gi;
+        const found = [];
+        let clean = text.replace(salawatRegex, (m) => { found.push(m); return ' '; });
+        clean = clean.replace(/\s{2,}/g, ' ').trim();
+        const salawatHtml = found.length ? found.join(' · ') : '';
+        return { clean, salawatHtml };
+    }
+
     function findTranslation(word) {
         const key = normalizeWord(word);
         return translationMap[key] || null;
@@ -958,9 +1147,15 @@
     }
 
     function startMode(mode) {
-        currentMode = mode;
-        state = { chunkIdx: 0, wordIdx: 0, repeatCount: 0, totalCycle: 0 };
         playEffect('tap');
+        if (mode === 'learn') {
+            showModeSettings('learn');
+            return;
+        }
+        if (mode === 'write') {
+            showModeSettings('write');
+            return;
+        }
         if (mode === 'translate') {
             prepareTranslateMode();
             showScreen('screen-translate');
@@ -970,6 +1165,20 @@
             prepareFillMode();
             showScreen('screen-fill');
             return;
+        }
+    }
+
+    function startPractice(mode) {
+        currentMode = mode;
+        state = { chunkIdx: 0, wordIdx: 0, repeatCount: 0, totalCycle: 0 };
+        if (mode === 'learn') {
+            const sentences = splitSentences(hadithText);
+            chunks = [];
+            for (let i = 0; i < sentences.length; i += config.sentencesPerGroup) {
+                chunks.push(sentences.slice(i, i + config.sentencesPerGroup).join(" "));
+            }
+        } else if (mode === 'write') {
+            words = hadithText.split(/\s+/).filter(Boolean);
         }
         showScreen('screen-practice');
         updatePracticeDisplay();
@@ -987,7 +1196,7 @@
         words = hadithText.split(/\s+/).filter(Boolean);
         if (words.length === 0) {
             playEffect('alert');
-            return alert('Сначала добавь текст хадиса.');
+            return showToast('Сначала добавь текст хадиса.');
         }
         const count = Math.min(4, Math.max(1, Math.floor(words.length / 4)));
         const indices = [];
@@ -1078,10 +1287,10 @@
         });
         if (correctCount === inputs.length) {
             playEffect('confirm');
-            alert('Все слова вставлены верно! Отличная работа.');
+            showToast('Все слова вставлены верно! Отличная работа.');
         } else {
             playEffect('alert');
-            alert(`Правильно: ${correctCount} из ${inputs.length}.`);
+            showToast(`Правильно: ${correctCount} из ${inputs.length}.`);
         }
     }
 
@@ -1097,7 +1306,7 @@
         playEffect('click');
         const active = document.querySelector('.screen.active').id;
         if (active === 'screen-practice' || active === 'screen-translate' || active === 'screen-fill') showScreen('screen-modes');
-        else if (active === 'screen-modes') showScreen('screen-settings');
+        else if (active === 'screen-settings') showScreen('screen-modes');
         else showScreen('screen-start');
     }
 
@@ -1105,7 +1314,7 @@
     function handleTap() {
         playEffect('tap');
         if (currentMode === 'write') {
-            state.wordIdx++;
+            state.wordIdx += config.writeWordsPerStep;
             if (state.wordIdx >= words.length) finish();
         } 
         else if (currentMode === 'learn') {
@@ -1129,10 +1338,14 @@
         const counter = document.getElementById('bigCounter');
 
         if (currentMode === 'write') {
-            const txt = words[state.wordIdx] || "";
+            const start = Math.min(state.wordIdx, words.length);
+            const end = Math.min(words.length, start + config.writeWordsPerStep);
+            const chunkWords = words.slice(start, end);
+            const txt = chunkWords.join(' ');
             display.innerText = txt;
-            prog.innerText = `Слово: ${state.wordIdx + 1} / ${words.length}`;
-            counter.innerText = `Слово ${state.wordIdx + 1} из ${words.length}`;
+            const shownCount = Math.min(end, words.length);
+            prog.innerText = `Слово: ${shownCount} / ${words.length}`;
+            counter.innerText = `Слово ${shownCount} из ${words.length}`;
             if (subtitlesEnabled) document.getElementById('subtitleOverlay').innerText = txt;
         } 
         else if (currentMode === 'learn') {
@@ -1146,7 +1359,7 @@
 
     function finish() {
         playEffect('confirm');
-        alert("Задание выполнено! Отличная работа.");
+        showToast("Задание выполнено! Отличная работа.");
         showScreen('screen-modes');
     }
 
